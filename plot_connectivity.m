@@ -1,4 +1,4 @@
-function plot_connectivity(connmat, rois, edges_fname, quantiles, directed)
+function plot_connectivity(connmat, rois, edges_fname, nodes_fname, quantiles, directed)
 
 if ~exist('quantiles', 'var')
    quantiles = [0.95, 0.75, 0.5]; 
@@ -10,7 +10,6 @@ end
 
 % define paths and names:
 tmp_res_folder = 'results\';
-nodes_fname = 'Desikan-nodes.node';
 fig_folder = 'fig';
 
 rois_labels = {rois.Scouts().Label};
@@ -32,13 +31,13 @@ for quant  = quantiles
     qntstr = strrep(num2str(quant), '.', 'p');
     edges_fname_q = [edges_fname, '_', qntstr];
     create_edges(connmat, [tmp_res_folder, edges_fname_q], quant, ...
-                          [tmp_res_folder, nodes_fname], rois_labels);
+                          nodes_fname, rois_labels);
                                                 
                                                 
     % Visualize results with BrainNet:
     fig_fname = [edges_fname_q, '.png'];
     BrainNet_MapCfg('BrainMesh_ICBM152.nv', [tmp_res_folder, nodes_fname], ...
-        [tmp_res_folder, edges_fname, '.edge'], ...
+        [tmp_res_folder, edges_fname_q, '.edge'], ...
         tmp_fname, ...
         [fig_folder, filesep, fig_fname]);
 
