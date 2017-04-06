@@ -14,8 +14,8 @@ end
 REPORT_FOLDER = 'reports/';
 
 tex_filename = fullfile(REPORT_FOLDER, tex_filename);
-figures_early = dir(fullfile(folder, ['*', method 'early*.png']));
-figures_late = dir(fullfile(folder, ['*', method 'late*.png']));
+figures_early = dir(fullfile(folder, ['*', method '*early*.png']));
+figures_late = dir(fullfile(folder, ['*', method '*late*.png']));
 
 strbeg = [  '\\documentclass[12pt]{article}\n', ...
             '\\extrafloats{100}\n',...

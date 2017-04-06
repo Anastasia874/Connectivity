@@ -1,5 +1,4 @@
-function create_edges(connectivity_matrix, fname, quant, nodes_file, roi_names, ...
-                                                            group1, group2)
+function create_edges(connectivity_matrix, fname, quant, nodes_file, roi_names)
 
 if nargin < 3
     quant = 0.5;
@@ -13,14 +12,10 @@ if ~exist('roi_names', 'var')
     roi_names = {};
 end
 
-if ~exist('group1', 'var')
-    group1 = roi_names;
-    group2 = roi_names;
-end
-    
+   
     
 connectivity_matrix = rearrange_nodes(connectivity_matrix, nodes_file, ...
-                                roi_names, group1, group2);
+                                roi_names);
 
 
 
