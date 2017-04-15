@@ -11,10 +11,11 @@ genpath(pwd);
 
 time_ranges = {time <= 0.2, time >= 0.35 & time <= 0.55};
 labels = {'early', 'late'};
-methods = {'granger', 'coh'};
+methods = {'granger'}; % , 'coh'
 NODES = ['data', filesep, 'Desikan-nodes.node'];
-QUANTILES = [0.99, 0.999]; % less than 0.95 makes no sense
+QUANTILES = 0; % percentage of left out connections; At least 0.99 if no filtering is applied
 DIRECTED = 1;
+ALPHA = 0.01; % significance for gamma filtering 
 GROUPS = { {'Left', 'Right'}, {'LO', 'LF'}, {'LO', 'RO'} };
 NGRPS = { 2, 1, 1 };
 
@@ -24,6 +25,11 @@ cfg.order  = 10; % from Izyurov
 cfg.toolbox = 'biosig';
 cfg.output = 'parameters';
 
+% define frequency bands:
+bands = struct('name', {'alpha', 'beta', 'gamma'}, ...
+               'freqs', {8:15, 16:31, 31:250});
+
+
 % visualization parameters:
 visfcg = [];
 viscfg.nodes_fname = NODES;
@@ -31,6 +37,8 @@ viscfg.quantiles = QUANTILES;
 viscfg.directed = DIRECTED;
 viscfg.rois = rois; % {rois.Scouts().Label}
 viscfg.output = 'pow';
+viscfg.bands = bands;
+viscfg.alpha = ALPHA;
 
 
 rois_names = {rois.Scouts().Label};

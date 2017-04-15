@@ -14,6 +14,10 @@ quantiles = viscfg.quantiles;
 directed = viscfg.directed;
 rois = viscfg.rois;
 output = viscfg.output;
+bands = viscfg.bands;
+alpha = viscfg.alpha;
+
+
 group_name = strjoin(viscfg.group, '_'); % specific brain regions
 
 
@@ -37,19 +41,25 @@ for m = 1:length(methods)
         case 'coh'
             [spectrum, freqs] = coherence_mvr(datapow, output);
     end  
-    for f = 1:50:length(freqs)
-        connmat = spectrum(:, :, f);
-        % normalize to [0, 1]
-        connmat = (connmat - min(connmat(:)));
-        connmat = connmat / max(connmat(:));
+    
+    for nb = 1:length(bands)
+        fname_f = [fname, bands(nb).name];
+        connmat = connectivity_by_frband(spectrum, bands(nb).freqs, alpha);
         % select relevant group indices:
-        connmat = get_full_conn_matrix(connmat, group1, group2, nrois);        
-        fname_f = [fname, '_fr_', num2str(freqs(f))];
-        plot_connectivity(connmat, rois, fname_f, nodes_fname, ...
-                                                       quantiles, directed);
+        connmat = get_full_conn_matrix(connmat, group1, group2, nrois);
+        if sum(connmat(:)) > 0
+            plot_connectivity(connmat, rois, fname_f, nodes_fname, ...
+                                                           quantiles, directed);
+        else
+            fprinf('No connections found with method %s for %s %s band, ', ...
+                'alpha= %0.3f, \n; %s', ...
+                methods{m}, label, bands(nb).name, alpha, group_name);
+        end
     end
-end
 
 end
+
+
+
 
 

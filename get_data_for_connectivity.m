@@ -1,7 +1,7 @@
 function [data, time, mean_cd_by_roi, rois] = get_data_for_connectivity(data_path)
 
 if nargin < 1
-    data_path = '..\data\brainstorm_to_mne\';
+    data_path = 'data\brainstorm_to_mne\';
 end
 
 roi_fname = [data_path, 'scout_Desikan-Killiany_68.mat'];
