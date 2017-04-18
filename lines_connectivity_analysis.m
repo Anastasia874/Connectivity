@@ -1,6 +1,10 @@
 function lines_connectivity_analysis
 
 addpath('..\matlab_toolboxes\fieldtrip\');
+addpath('..\matlab_toolboxes\BrainNet\');
+addpath('..\matlab_toolboxes\Kurganskiy\VAR\');
+addpath('..\matlab_toolboxes\Kurganskiy\3party\');
+addpath('..\matlab_toolboxes\Kurganskiy\signal\');
 addpath('data\');
 addpath('utils\');
 addpath('connectivity\');
@@ -15,13 +19,14 @@ methods = {'granger'}; % , 'coh'
 NODES = ['data', filesep, 'Desikan-nodes.node'];
 QUANTILES = 0; % percentage of left out connections; At least 0.99 if no filtering is applied
 DIRECTED = 1;
+VAR_ORDER = 10; % from Izyurov
 ALPHA = 0.01; % significance for gamma filtering 
-GROUPS = { {'Left', 'Right'}, {'LO', 'LF'}, {'LO', 'RO'} };
-NGRPS = { 2, 1, 1 };
+GROUPS = { {'LO', 'LF'}, {'LO', 'RO'}, {'Left', 'Right'} };
+NGRPS = { 1, 1, 2 }; % one for symmetric case, 2 for assymetric
 
 % mvr parameters:
 cfg  = [];
-cfg.order  = 10; % from Izyurov
+cfg.order  = VAR_ORDER; 
 cfg.toolbox = 'biosig';
 cfg.output = 'parameters';
 
@@ -45,7 +50,9 @@ rois_names = {rois.Scouts().Label};
 
 for t = 1:length(time_ranges)    
     t_idx = time_ranges{t};
-    crnt_dencity = mean_cd_by_roi(:, t_idx);
+    crnt_density = mean_cd_by_roi(:, t_idx);
+    
+%     test_mvr(crnt_density, 10)
 
     for gp = 1:length(GROUPS)
     % extract qroup info:    
@@ -63,7 +70,7 @@ for t = 1:length(time_ranges)
     idx_g = unique([idx_g1, idx_g2]);
     % create FieldTrip data structure:
     data = [];
-    data.trial{1} = crnt_dencity(idx_g, :);
+    data.trial{1} = crnt_density(idx_g, :);
     data.time{1} = time(t_idx);
     data.label = rois_names(idx_g);
     data.fsample = 1/mean(diff(time));

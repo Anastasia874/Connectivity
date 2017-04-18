@@ -1,5 +1,7 @@
 function plot_connectivity(connmat, rois, edges_fname, nodes_fname, quantiles, directed)
 
+addpath('..\matlab_toolboxes\BrainNet\Data\SurfTemplate\');
+
 if ~exist('quantiles', 'var')
    quantiles = [0.95, 0.75, 0.5]; 
 end
@@ -16,7 +18,7 @@ rois_labels = {rois.Scouts().Label};
 
 
 % load configuration file for BrainNet visualization:
-default_options = 'options\full_nodes_jet_edge_directed_size_same_opacity_9.mat';
+default_options = 'options\full_nodes_gray_edge_directed_size_0p4_opacity_9.mat';
 options = load(default_options);
 
 % change and save them into temporary file:
