@@ -6,9 +6,9 @@ function idx_g1 = find_stridx(group1, all_rois)
 % all_rois - cell array with all ROIs names
 
 ng1 = length(group1);
-idx_g1 = zeros(1, ng1);
+idx_g1 = [];
 for g = 1:ng1
-    idx_g1(g) = find(strcmp(all_rois, group1{g}));
+    idx_g1 = [idx_g1, find(strcmp(all_rois, group1{g}))];
 end
 
 end

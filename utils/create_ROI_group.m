@@ -13,9 +13,9 @@ end
 
 idx_g = [];
 for gpl = 1:numel(group_labels) 
-    if strcmp(group_labels, 'L') || strcmpi(group_labels, 'left')
+    if any(strcmp(group_labels, 'L')) || any(strcmpi(group_labels, 'left'))
         idx_g = [idx_g, 1:2:length(regions)-1];
-    elseif strcmp(group_labels, 'R') || strcmpi(group_labels, 'right')
+    elseif any(strcmp(group_labels, 'R')) || any(strcmpi(group_labels, 'right'))
         idx_g = [idx_g, 2:2:length(regions)];
     else
         idx_g = [idx_g, find_stridx(group_labels, regions)];
