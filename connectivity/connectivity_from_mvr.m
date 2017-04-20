@@ -24,7 +24,7 @@ group_name = strjoin(viscfg.group, '_'); % specific brain regions
 if iscell(group1) && iscell(group2)
     nrois = {rois.Scouts().Label};
 else
-    nrois = numel(rois);
+    nrois = numel(rois.Scouts);
 end
 
 
@@ -36,15 +36,16 @@ datapow = ft_freqanalysis(cfg, mdata);
 for m = 1:length(methods)
     fname = [methods{m}, '_', label, '_', group_name];
     switch methods{m}
-        case 'granger'
-            [spectrum, freqs] = granger_mvr(datapow, output);
+        case {'granger' 'total_interdependence' 'instantaneous_causality'}
+            [spectr, freqs] = granger_mvr(datapow, output);
         case 'coh'
-            [spectrum, freqs] = coherence_mvr(datapow, output);
+            [spectr, freqs] = coherence_mvr(datapow, output);
     end  
     
     for nb = 1:length(bands)
-        fname_f = [fname, bands(nb).name];
-        connmat = connectivity_by_frband(spectrum, bands(nb).freqs, alpha);
+        fname_f = [fname, '_', bands(nb).name];
+        connmat = connectivity_by_frband(spectr, bands(nb).freqs, alpha);
+        report_graph_stats(connmat, fname_f, 0.75, 'gamma');
         % select relevant group indices:
         connmat = get_full_conn_matrix(connmat, group1, group2, nrois);
         if sum(connmat(:)) > 0
