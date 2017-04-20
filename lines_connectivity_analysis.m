@@ -15,14 +15,14 @@ genpath(pwd);
 
 time_ranges = {time <= 0.2, time >= 0.35 & time <= 0.55};
 labels = {'early', 'late'};
-methods = {'granger'}; % , 'coh'
+methods = {'total_interdependence', 'granger'}; % , 'coh'
 NODES = ['data', filesep, 'Desikan-nodes.node'];
 QUANTILES = 0; % percentage of left out connections; At least 0.99 if no filtering is applied
 DIRECTED = 1;
 VAR_ORDER = 10; % from Izyurov
-ALPHA = 0.01; % significance for gamma filtering 
-GROUPS = { {'LO', 'LF'}, {'LO', 'RO'}, {'Left', 'Right'} };
-NGRPS = { 1, 1, 2 }; % one for symmetric case, 2 for assymetric
+ALPHA = 0.25; % gamma filtering quantile
+GROUPS = { {'LO', 'LF', 'RO', 'RF'}, {'Left', 'Right'} };
+NGRPS = { 1,  2 }; % one for symmetric case, 2 for assymetric
 
 % mvr parameters:
 cfg  = [];
@@ -54,36 +54,36 @@ for t = 1:length(time_ranges)
     
 %     test_mvr(crnt_density, 10)
 
-    for gp = 1:length(GROUPS)
+    for gp = 2:length(GROUPS)
     % extract qroup info:    
     group = GROUPS{gp};
     if NGRPS{t} == 2
         [idx_g1, ~] = create_ROI_group(group{1}, rois);
         [idx_g2, ~] = create_ROI_group(group{2}, rois);
-        group1 = group{1};
-        group2 = group{2};
     else
         [idx_g1, ~] = create_ROI_group(group, rois);
         idx_g2 = idx_g1; 
-        group1 = group{1}; group2 = group1;
     end
     idx_g = unique([idx_g1, idx_g2]);
     % create FieldTrip data structure:
     data = [];
-    data.trial{1} = crnt_density(idx_g, :);
+    x = crnt_density(idx_g, :)';
+    [x, minvec, maxvec] = normalize_by_col(x);
+    data.trial{1} = x';
     data.time{1} = time(t_idx);
     data.label = rois_names(idx_g);
     data.fsample = 1/mean(diff(time));
-    
+%     mvr_by_nlags(data, cfg, 1:20, minvec, maxvec, alpha);
     
     % MVR-model the data: 
     mdata = ft_mvaranalysis(cfg, data);
+    report_mvr(mdata.coeffs, x, data.label, minvec, maxvec, 0.05, 1);
     
     % test prediction quality:
     % mvr_prediction(data, mdata, 'residual');
     
     viscfg.tlabel = labels{t};
-    viscfg.group = {group1, group2};
+    viscfg.group = group;
     connectivity_from_mvr(mdata, methods, viscfg, idx_g1, idx_g2);   
     end
 end

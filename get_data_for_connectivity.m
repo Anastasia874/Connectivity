@@ -1,5 +1,20 @@
 function [data, time, mean_cd_by_roi, rois] = get_data_for_connectivity(data_path)
 
+% Read inverse solution, obtained in brainstorm data and aveerage by ROIs
+% (Desikan-Killiany regions)
+% Inputs:
+% data_path - path to data with .mat file
+% 
+% Outputs:
+% data - data structure, returned by brainstorm. Some of its fields are:
+%        data.HeadModelFile - stores file name with locations of the nodes
+%        data.ImageGridAmp - [n_nodes*3 x T] matrix with 3D current density
+%                            time series for each node
+% time - [1 x T] vector with time stamps (ms?)
+% mean_cd_by_roi - [68 x T] time series of dipole amplitudes, averaged by ROIs
+% rois - [1x 68] structure, fields are Name and Scouts. Scouts contain information 
+%        such as nodes positions and region name.
+
 if nargin < 1
     data_path = 'data\brainstorm_to_mne\';
 end
@@ -16,7 +31,8 @@ current_density = cd_normal(current_density_xyz);
 
 rois = load(roi_fname);
 dk_regions = {rois.Scouts().Vertices};
-mean_cd_by_roi = cellfun(@(vrt) mean(current_density(vrt, :)), dk_regions, 'UniformOutput', 0);
+mean_cd_by_roi = cellfun(@(vrt) mean(current_density(vrt, :)), dk_regions, ...
+                                                       'UniformOutput', 0);
 mean_cd_by_roi = cell2mat(mean_cd_by_roi');
 
 surface_fname = strsplit(surface_fname, '/');
