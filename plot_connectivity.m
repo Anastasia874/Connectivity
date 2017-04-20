@@ -22,11 +22,10 @@ default_options = 'options\full_nodes_gray_edge_directed_size_0p4_opacity_9.mat'
 options = load(default_options);
 
 % change and save them into temporary file:
-VIEW = 'full';
+VIEW = {'sagital', 'axial'}; %{'full'}, {'medial', 'medial_ventral', 'coronal'}
 EC = options.EC;
 EC.edg.directed = directed; 
 tmp_fname = ['options', filesep, 'tmp_brainnet_cfg.mat'];
-save(tmp_fname, 'EC');
 
 quantiles = quantiles(:)';
 for quant  = quantiles
@@ -37,11 +36,15 @@ for quant  = quantiles
                                                 
                                                 
     % Visualize results with BrainNet:
-    fig_fname = [edges_fname_q, '.png'];
+    for vw = VIEW
+    EC = set_brainnet_view(EC, vw{1});
+    save(tmp_fname, 'EC');
+    fig_fname = [edges_fname_q, '_', vw{1}, '.png'];
     BrainNet_MapCfg('BrainMesh_ICBM152.nv', nodes_fname, ...
         [tmp_res_folder, edges_fname_q, '.edge'], ...
         tmp_fname, ...
         [fig_folder, filesep, fig_fname]);
+    end
 
 end
 
