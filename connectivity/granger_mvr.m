@@ -12,7 +12,7 @@ cfg.output = output;
 res = ft_connectivityanalysis(cfg, datapow);
 
 %  this returns log(1 - ...) x --> y values with zeros on main diagonal
-grangerspctrm = res.grangerspctrm;
+grangerspctrm = exp(res.grangerspctrm);
 grfreq = res.freq; 
 
 

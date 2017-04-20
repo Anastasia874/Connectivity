@@ -1,4 +1,4 @@
-function [preds, res] = mvr_predict(coeffs, x)
+function [preds, res, coeffs] = mvr_predict(coeffs, x)
 
 dims = size(x);
 
