@@ -33,14 +33,14 @@ time = data.Time;
 if ~isempty(data.ImageGridAmp)
     current_density_xyz = data.ImageGridAmp;
 else
-    ts = load([data_path, 'lines_', subject{n}, '.mat']);
+    ts = load([data_path, 'lines_', subject, '.mat']);
     current_density_xyz = data.ImagingKernel * ts.F;
     time = ts.Time;
 end 
 current_density = cd_normal(current_density_xyz);
 
 rois = load(roi_fname);
-dk_regions = {rois{n}.Scouts().Vertices};
+dk_regions = {rois.Scouts().Vertices};
 mean_cd_by_roi = cellfun(@(vrt) mean(current_density(vrt, :)), dk_regions, ...
                                                        'UniformOutput', 0);
 cd_by_roi = cell2mat(mean_cd_by_roi');
