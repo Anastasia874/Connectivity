@@ -1,15 +1,14 @@
-function [preds, res] = report_mvr(coeffs, x, labels, minvec, maxvec, alpha, vbs)
+function [preds, res] = report_mvr(coeffs, data, alpha, vbs)
 
-if nargin < 4
-   minvec = zeros(1, size(x, 2));
-   maxvec = ones(1, size(x, 2));
-end
+x = data.trial{1}';
+minvec = data.minvec;
+maxvec = data.maxvec;
 
-if nargin < 6
+if nargin < 3
     alpha = 0.05;
 end
 
-if nargin < 7
+if nargin < 4
     vbs = 0;
 end
 
