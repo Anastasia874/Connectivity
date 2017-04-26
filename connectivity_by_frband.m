@@ -1,9 +1,9 @@
-function bmat = connectivity_by_frband(spectrum, freqs, alpha)
+function bmat = connectivity_by_frband(spectrum, freqs, band, alpha)
 
 bmat = zeros(size(spectrum(:, :, 1)));
 
-for f = 1:length(freqs)
-    connmat = spectrum(:, :, f);
+for f = 1:length(band)
+    connmat = spectrum(:, :, freqs == band(f));
     connmat = normalize_nondiag(connmat);
     connmat = gamma_filter(connmat, alpha);        
     bmat = bmat + connmat;

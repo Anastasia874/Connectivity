@@ -11,11 +11,22 @@ addpath('connectivity\');
 genpath(pwd);
 
 % data_path = 'data\brainstorm_to_mne\';
-[~, time, mean_cd_by_roi, rois] = get_data_for_connectivity;
 
-time_ranges = {time <= 0.2, time >= 0.35 & time <= 0.55};
-labels = {'early', 'late'};
-methods = {'total_interdependence', 'granger'}; % , 'coh'
+STIM_START = 0.2800;
+STIM_END = 0.3960;
+t0 = STIM_END;
+UPSAMPLING_RATE = 10;
+
+subjects = {'F_45', 'F_90', 'F_135', 'F_180'}; % {'M_45', 'M_90', 'M_135', 'M_180'}; %
+
+[orig_time, mean_cd_by_roi, rois] = get_data_for_connectivity(subjects{1});
+
+[mean_cd_by_roi, time] = upsample_data(mean_cd_by_roi, orig_time, UPSAMPLING_RATE);
+
+time_ranges = {time >= t0 & time <= t0 + 0.2, ...
+               time >= t0 + 0.35 & time <= t0 + 0.55};
+labels = {'late', 'early'};
+methods = {'time_domain', 'total_interdependence', 'granger'}; % , 'coh'
 NODES = ['data', filesep, 'Desikan-nodes.node'];
 QUANTILES = 0; % percentage of left out connections; At least 0.99 if no filtering is applied
 DIRECTED = 1;
@@ -26,9 +37,11 @@ NGRPS = { 1,  2 }; % one for symmetric case, 2 for assymetric
 
 % mvr parameters:
 cfg  = [];
-cfg.order  = VAR_ORDER; 
-cfg.toolbox = 'biosig';
+cfg.order  = VAR_ORDER * UPSAMPLING_RATE; 
+cfg.mvr = 'mvgc';  % toolbox for MVAR computation
+cfg.toolbox = 'biosig'; % toolbox for MVAR computation, called by filedtrip
 cfg.output = 'parameters';
+
 
 % define frequency bands:
 bands = struct('name', {'alpha', 'beta', 'gamma'}, ...
@@ -44,7 +57,7 @@ viscfg.rois = rois; % {rois.Scouts().Label}
 viscfg.output = 'pow';
 viscfg.bands = bands;
 viscfg.alpha = ALPHA;
-
+viscfg.regmode = 'OLS'; % for time-domain  Granger
 
 rois_names = {rois.Scouts().Label};
 
@@ -54,7 +67,7 @@ for t = 1:length(time_ranges)
     
 %     test_mvr(crnt_density, 10)
 
-    for gp = 2:length(GROUPS)
+    for gp = 1:length(GROUPS)
     % extract qroup info:    
     group = GROUPS{gp};
     if NGRPS{t} == 2
@@ -73,11 +86,12 @@ for t = 1:length(time_ranges)
     data.time{1} = time(t_idx);
     data.label = rois_names(idx_g);
     data.fsample = 1/mean(diff(time));
-%     mvr_by_nlags(data, cfg, 1:20, minvec, maxvec, alpha);
+    data.minvec = minvec;
+    data.maxvec = maxvec;
     
     % MVR-model the data: 
-    mdata = ft_mvaranalysis(cfg, data);
-    report_mvr(mdata.coeffs, x, data.label, minvec, maxvec, 0.05, 1);
+    mdata = mvaranalysis(cfg, data, 1);
+    report_mvr(mdata.coeffs, data, 0.05, 1);
     
     % test prediction quality:
     % mvr_prediction(data, mdata, 'residual');
