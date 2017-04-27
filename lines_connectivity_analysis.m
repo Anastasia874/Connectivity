@@ -1,10 +1,6 @@
 function lines_connectivity_analysis
 
-addpath('..\matlab_toolboxes\fieldtrip\');
-addpath('..\matlab_toolboxes\BrainNet\');
-addpath('..\matlab_toolboxes\Kurganskiy\VAR\');
-addpath('..\matlab_toolboxes\Kurganskiy\3party\');
-addpath('..\matlab_toolboxes\Kurganskiy\signal\');
+addpath(genpath('..\matlab_toolboxes'));
 addpath('data\');
 addpath('utils\');
 addpath('connectivity\');
@@ -17,7 +13,7 @@ STIM_END = 0.3960;
 t0 = STIM_END;
 UPSAMPLING_RATE = 10;
 
-subjects = {'F_45', 'F_90', 'F_135', 'F_180'}; % {'M_45', 'M_90', 'M_135', 'M_180'}; %
+subjects = {'F_45', 'F_90', 'F_135', 'F_180', 'M_45', 'M_90', 'M_135', 'M_180'}; %
 
 [orig_time, mean_cd_by_roi, rois] = get_data_for_connectivity(subjects{1});
 
@@ -33,7 +29,7 @@ DIRECTED = 1;
 VAR_ORDER = 10; % from Izyurov
 ALPHA = 0.25; % gamma filtering quantile
 GROUPS = { {'LO', 'LF', 'RO', 'RF'}, {'Left', 'Right'} };
-NGRPS = { 1,  2 }; % one for symmetric case, 2 for assymetric
+NGRPS = { 1,  2 }; % 1 for symmetric case, 2 for assymetric
 
 % mvr parameters:
 cfg  = [];

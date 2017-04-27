@@ -41,7 +41,7 @@ for m = 1:length(methods)
         case 'time_domain'
             res = granger_mvr(cfg, mdata);
             connmat = res.gcmatrix .* res.sig;
-            report_graph_stats(connmat, fname, 0.75, 'normal');
+%             report_graph_stats(connmat, fname, 0.75, 'normal');
             connmat = get_full_conn_matrix(connmat, group1, group2, nrois);
  
             if sum(connmat(:)) > 0
